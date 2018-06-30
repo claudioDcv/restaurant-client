@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/lib.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+    <div class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="/buscar" class="pure-menu-link">Buscar</a></li>
+            <li class="pure-menu-item"><a href="/" class="pure-menu-link">Crear Reserva</a></li>
+        </ul>
+    </div>
+
+    <div class="pure-g">
+            <div class="pure-u-1-5"></div>
+            <div class="pure-u-3-5">
+            <form class="pure-form">
+                <fieldset>
+                    <legend>Reserva #<span id="pedido_id"></span></legend>
+                    <label>
+                        Cliente
+                        <strong id="cliente_nombre"></strong>
+                    </label><br/>
+                    <label>
+                        Mesa
+                        <strong id="mesa_nombre"></strong>
+                    </label>
+                    <hr />
+
+                    <label for="producto_id">Nuevo Producto</label>
+
+        
+                    <select id="producto_id" name="producto_id">
+                    </select>
+                    <button type="submit" class="pure-button pure-button-primary" id="guardar">Agregar Producto</button>
+                    <hr />
+                    <br />
+                    <label for="producto_id">Productos Agregados</label>
+
+                    <div class="pure-menu custom-restricted-width">
+                        <ul id="productos_lista">
+                        </ul>
+                    </div>
+                        
+                    <hr/>
+
+                    <label>Total del Pedido</label>
+                    <div>$<span id="pedido_total"></span></div>
+
+                    <button class="button-success pure-button" id="pagar-y-eliminar">Pagar</button>
+
+                </fieldset>
+            </form>
+        </div>
+        <div class="pure-u-1-5"></div>
+    </div>
+    <script src="js/jq.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+
+        var reserva_id = window.location.search.replace('?reserva_id=', '');
+        var guardar = function() {
+            $("#guardar").click(function(e) {
+                e.preventDefault();
+                var producto_id = $("#producto_id").val(); 
+    
+                var dataString = JSON.stringify({
+                    producto_id: producto_id,
+                    reserva_id: reserva_id
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: dataString,
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    url: api + '/pedidos',
+                    success: function(data) {
+                        window.location.href = '/pedido?reserva_id=' + reserva_id;
+                    }
+                });
+            });
+        };
+        
+        var pagarYEliminar = function() {
+            $("#pagar-y-eliminar").click(function(e) {
+                e.preventDefault();
+                reservaEliminarPorID(reserva_id, function(resultado) {
+                    console.log(resultado);
+                    alert('Pagado con Exito');
+                    window.location.href = '/';
+                });
+            });
+        };
+
+        pagarYEliminar();
+
+        productos('#producto_id');
+        
+        pedidosPorReservaId(reserva_id, function(data) {
+            console.log(data);
+        });
+        reservaPorID(reserva_id, function(data) {
+            console.log(data);
+            $('#pedido_id').html(data.model.id);
+            $('#cliente_nombre').html(data.model.cliente.nombre);
+            $('#mesa_nombre').html(data.model.mesa.nombre);
+            $('#pedido_total').html(data.total);
+            var productos = '';
+            data.model.pedidos.forEach(function(e) {
+                productos = productos + '<li class="pure-menu-item"><a href="#" class="pure-menu-link">' + e.producto.nombre + '</a></li>';
+            });
+            $('#productos_lista').html(productos);
+        });
+
+        guardar();
+    </script>
+</body>
+</html>

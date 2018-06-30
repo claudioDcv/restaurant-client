@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/lib.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+    <div class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item pure-menu-selected"><a href="/buscar" class="pure-menu-link">Buscar</a></li>
+            <li class="pure-menu-item"><a href="/" class="pure-menu-link">Crear Reserva</a></li>
+        </ul>
+    </div>
+    
+    <div class="pure-g">
+        <div class="pure-u-1-5"></div>
+        <div class="pure-u-3-5">
+            <form class="pure-form">
+                <fieldset>
+                    <legend>Buscar Reserva</legend>
+                        <input type="text" class="pure-input-rounded" id="nombre" placeholder="Ingrese nombre cliente"/>
+                        <button type="submit" class="pure-button" id="buscar">Buscar</button>
+
+                        <br />
+                        <label for="producto_id">Reservas Encontradas</label>
+
+                        <br />
+
+                        <div class="pure-menu custom-restricted-width">
+                            <ul id="reservas_lista">
+                            </ul>
+                        </div>
+
+                        <br/>
+                </fieldset>
+            </form>
+        </div>
+        <div class="pure-u-1-5"></div>
+    </div>
+    <script src="js/jq.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+
+        var guardar = function() {
+            $("#buscar").click(function(e) {
+                e.preventDefault();
+
+                var nombre = $('#nombre').val();
+                reservaPorNombreCliente(nombre, function(resultado) {
+                console.log(resultado);
+
+                var lista = '';
+                resultado.forEach(function(e) {
+                    lista = lista + '<li class="pure-menu-item"><a href="pedido?reserva_id=' + e.id + '" class="pure-menu-link">#' 
+                        + e.id 
+                        + ' con la mesa #' 
+                        + e.mesa.id 
+                        + ' ' 
+                        + e.mesa.nombre 
+                        + ' | Cliente '
+                        + e.cliente.nombre
+                        +  '</a></li>';
+                });
+                $('#reservas_lista').html(lista);
+                
+                });
+            });
+        };
+
+        guardar();
+        
+    </script>
+</body>
+</html>
